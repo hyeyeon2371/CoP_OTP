@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TOTP2\TOTP2.csproj" />
-    <ProjectReference Include="..\TOTP\TOTP1.csproj" />
+    <ProjectReference Include="..\OTP2\OTP2.csproj" />
+    <ProjectReference Include="..\OTP1\OTP1.csproj" />
   </ItemGroup>
 
 </Project>
