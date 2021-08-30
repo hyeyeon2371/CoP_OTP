@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TOTP2\TOTP2.csproj" />
+    <ProjectReference Include="..\TOTP\TOTP1.csproj" />
+  </ItemGroup>
+
+</Project>
