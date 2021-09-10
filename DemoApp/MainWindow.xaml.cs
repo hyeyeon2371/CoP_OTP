@@ -24,5 +24,26 @@ namespace DemoApp
         {
             InitializeComponent();
         }
+
+        // 인증 버튼 클릭 
+        private void Auth_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Boolean isSuccess = false;
+            if (isSuccess)
+            {
+                MessageBox.Show("Success");
+            } else
+            {
+                MessageBox.Show("Failed");
+            }
+            
+        }
+
+        // 번호 생성 버튼 클릭 
+        private void Generate_Buton_Click(object sender, RoutedEventArgs e)
+        {
+            String otp = "9999 9999";
+            NewOtpText.Text = otp;
+        }
     }
 }
