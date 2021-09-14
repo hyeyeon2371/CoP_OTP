@@ -1,17 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DemoApp
 {
@@ -20,6 +8,12 @@ namespace DemoApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        private String SECRET_KEY = "otp";
+        private String ALGORITHM = "SHA256";
+        private int TIME = 60;
+        private int DIGIT = 6;
+   
+
         public MainWindow()
         {
             InitializeComponent();
@@ -28,7 +22,11 @@ namespace DemoApp
         // 인증 버튼 클릭 
         private void Auth_Button_Click(object sender, RoutedEventArgs e)
         {
-            Boolean isSuccess = false;
+            // 입력한 OTP 번호 
+            String inputOtp = inputOtpText.Text;
+            Boolean isSuccess = VerifyOTP1(inputOtp);
+
+
             if (isSuccess)
             {
                 MessageBox.Show("Success");
@@ -42,8 +40,19 @@ namespace DemoApp
         // 번호 생성 버튼 클릭 
         private void Generate_Buton_Click(object sender, RoutedEventArgs e)
         {
-            String otp = "9999 9999";
+            String otp = GenerateOTP1();
             NewOtpText.Text = otp;
+        }
+
+        // OTP1 호출 
+        private Boolean VerifyOTP1(String otp)
+        {
+            return OTP1.TOTP.VerifyOTP(otp, SECRET_KEY, TIME, DIGIT, ALGORITHM);
+        }
+
+        private String GenerateOTP1()
+        {
+            return OTP1.TOTP.GenerateOTP(SECRET_KEY, TIME, DIGIT, ALGORITHM);
         }
     }
 }

@@ -17,7 +17,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="67,114,0,0" TextWrapping="Wrap" Text="OTP Authenticator" VerticalAlignment="Top" FontSize="22"/>
 
         <Border  Height="40" Width="182" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="1" BorderBrush="Navy" Background="White" CornerRadius="6" Margin="69,178,0,0" Style="{StaticResource RoundBorder}">
-            <TextBox TextWrapping="Wrap" Text="1234 5678" VerticalContentAlignment="Center" FontSize="16"  Padding="4, 0, 4, 0" 
+            <TextBox  TextWrapping="Wrap" VerticalContentAlignment="Center" FontSize="16"  Padding="4, 0, 4, 0" 
                      Name="inputOtpText"  BorderThickness="0" BorderBrush="White" Margin="2,5,6,5"/>
 
         </Border>
@@ -33,7 +33,7 @@
 
                     <Style.Triggers>
 
-                        <DataTrigger Binding="{Binding Text, ElementName=otpTextBox}" Value="">
+                        <DataTrigger Binding="{Binding Text, ElementName=inputOtpText}" Value="">
 
                             <Setter Property="Visibility" Value="Visible"/>
 
@@ -51,7 +51,7 @@
         <Button Click="Auth_Button_Click" Width="182" Height="40" Margin="69,256,399,154" FontSize="12" BorderBrush="Navy" Background="Navy" Foreground="White" Style="{StaticResource RoundButton}" Content="Authenticate"/>
 
         <TextBlock HorizontalAlignment="Left" Margin="408,114,0,0" TextWrapping="Wrap" Text="OTP Generator" VerticalAlignment="Top" FontSize="22"/>
-        <TextBlock Name ="NewOtpText" HorizontalAlignment="Left" Margin="433,183,0,0" TextWrapping="Wrap" Text="1234 5678" VerticalAlignment="Top" FontSize="22"/>
+        <TextBlock Width="160" Name ="NewOtpText" HorizontalAlignment="Left" Margin="408,183,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="22" Text="-" TextAlignment="Center"/>
         <Button Click ="Generate_Buton_Click" Width="182" Height="40" Margin="398,256,70,154" FontSize="12" BorderBrush="Navy" Background="Navy" Foreground="White" Style="{StaticResource RoundButton}" Content="Generate"/>
 
         <Border BorderBrush="LightGray" BorderThickness="1" HorizontalAlignment="Left" Height="347" Margin="326,31,0,0" VerticalAlignment="Top" Width="1"/>
