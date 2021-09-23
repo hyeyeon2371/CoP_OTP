@@ -11,10 +11,9 @@ namespace OTP2
         public static void Main(string[] args)
         {
             
-            //string seed = "3530534f31375a4648534557454e5a584849575157594d535254314b4c434d44";
+            //Base32(구글default)
             string seed = "35494e564e454e554d3252414a4c5144323437555a3145463545544345454652";
             /*
-            // 랜덤으로 만들어서 base32 인코딩 하기
             string AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789";
             int n = 32; // 길이 either 20 or 32
             Random random = new Random();
