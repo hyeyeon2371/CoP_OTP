@@ -2,18 +2,22 @@
 using System.Text;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Diagnostics;
 
+//DoHaeng Lee
 namespace OTP2
 {
-    class TOTP
+    public class TOTP
     {
         public static void Main(string[] args)
         {
-            
-            //Base32(구글default)
-            string seed = "35494e564e454e554d3252414a4c5144323437555a3145463545544345454652";
+
+            string seed = "38364a303143513253344f52385857544d55524d";
+            //string seed = "HA3EUMBRINITEUZUJ5JDQWCXKRGVKUSN";
+
+            //string seed = "35494e564e454e554d3252414a4c5144323437555a3145463545544345454652";
+
             /*
+            // 랜덤으로 만들어서 base32 인코딩 하기
             string AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789";
             int n = 32; // 길이 either 20 or 32
             Random random = new Random();
@@ -28,20 +32,13 @@ namespace OTP2
 
             int seconds = 60;
             int digit = 8;
-            string algorithm = "Sha256";
+            string algorithm = "SHA256";
 
             Boolean ans = VerifyOTP(userOtp, seed, seconds, digit, algorithm);
-            Debug.WriteLine("ans : " + ans);
         }
 
         public static Boolean VerifyOTP(string userOtp, string seed, int seconds, int digit, string algorithm)
         {
-            Debug.WriteLine("userOtp : " + userOtp);
-            Debug.WriteLine("seed : " + seed);
-            Debug.WriteLine("seconds : " + seconds);
-            Debug.WriteLine("digit : " + digit);
-            Debug.WriteLine("algorithm : " + algorithm);
-
             Boolean ans = false;
 
             //한 번 입력한 otp는 재입력 불가하게 할 거면 db랑 엮어서
@@ -56,14 +53,14 @@ namespace OTP2
 
             if (!usedORnot.Equals("NONE"))
             {
-                string[] strArr = usedORnot.Split("|");
+                string[] strArr = usedORnot.Split('|');
                 arrLength = strArr.Length;
                 while (j < arrLength)
                 {
                     if (userOtp.Equals(strArr[j]))
                     {
-                        Debug.WriteLine("strArr[" + j + "] : " + strArr[j]);
-                        Debug.WriteLine("ALREADY USED");
+                        //Debug.WriteLine("strArr[" + j + "] : " + strArr[j]);
+                        Console.WriteLine("ALREADY USED");
                         alreadyUsed = "Y";
                         break;
                     }
@@ -82,7 +79,7 @@ namespace OTP2
                 */
                 long X = Convert.ToInt64(seconds);
 
-                long curMs = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                long curMs = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 long current = curMs / 1000L;   // ms 에서 s로
 
                 int length = setMin * 2 + 1;
@@ -100,8 +97,8 @@ namespace OTP2
                     {
                         long T = (timeArr[i] - T0) / X;
                         int Tint = (int)T;
-                        string chkOtp = generateOTP(seed, Tint, digit, algorithm);
-                        Debug.WriteLine(i + " : " + chkOtp);
+                        string chkOtp = GenerateOTP(seed, Tint, digit, algorithm);
+                        //Console.WriteLine(i + " : " + chkOtp);
                         if (userOtp.Equals(chkOtp))
                         {
                             ans = true;
@@ -111,7 +108,8 @@ namespace OTP2
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("Error : " + e);
+                    //Debug.WriteLine("Error : " + e);
+                    Console.WriteLine("Error : " + e);
                 }
             }
 
@@ -131,7 +129,7 @@ namespace OTP2
                     newUsed = newUsed + "|";
                 }
                 newUsed += userOtp;
-                Debug.WriteLine("newUsed : " + newUsed);
+                //Debug.WriteLine("newUsed : " + newUsed);
                 // DB 사용 시
                 /*
                 if(newUsed.Equals("NONE")) 
@@ -144,8 +142,30 @@ namespace OTP2
             return ans;
         }
 
-        private static string generateOTP(string sec32, int Tint, int digit, string algorithm)
+        public static string GenerateOTP(string sec32, int Tint, int digit, string algorithm)
         {
+            foreach (char a in sec32)
+            {
+                if (Char.IsUpper(a))
+                {
+                    string b32 = FromBase32(sec32);
+                    sec32 = str2hex(b32).ToLower();
+                    break;
+                }
+            }
+
+            int seconds = Tint;
+            long T0 = 0; // default=0   ->  T를 unix 시간으로 구했으니 이대로 0
+            if (Tint< 27000000)
+            {
+                //user set Tint as timestep
+                long X = Convert.ToInt64(seconds);
+                long curMs = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                long current = curMs / 1000L;   // ms 에서 s로
+                long Tlong = (current - T0) / X;
+                Tint = (int)Tlong;
+
+            }
             long T = Convert.ToInt64(Tint);
 
             string result = "";
@@ -175,6 +195,87 @@ namespace OTP2
             return result;
         }
 
+        private static string FromBase32(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            input = input.TrimEnd('='); //remove padding characters
+            int byteCount = input.Length * 5 / 8; //this must be TRUNCATED
+            byte[] returnArray = new byte[byteCount];
+
+            byte curByte = 0, bitsRemaining = 8;
+            int mask = 0, arrayIndex = 0;
+
+            foreach (char c in input)
+            {
+                int cValue = CharToValue(c);
+
+                if (bitsRemaining > 5)
+                {
+                    mask = cValue << (bitsRemaining - 5);
+                    curByte = (byte)(curByte | mask);
+                    bitsRemaining -= 5;
+                }
+                else
+                {
+                    mask = cValue >> (5 - bitsRemaining);
+                    curByte = (byte)(curByte | mask);
+                    returnArray[arrayIndex++] = curByte;
+                    curByte = (byte)(cValue << (3 + bitsRemaining));
+                    bitsRemaining += 3;
+                }
+            }
+
+            //if we didn't end with a full byte
+            if (arrayIndex != byteCount)
+            {
+                returnArray[arrayIndex] = curByte;
+            }
+
+            return Encoding.Default.GetString(returnArray);
+        }
+
+        private static int CharToValue(char c)
+        {
+            int value = (int)c;
+
+            //65-90 == uppercase letters
+            if (value < 91 && value > 64)
+            {
+                return value - 65;
+            }
+            //50-55 == numbers 2-7
+            if (value < 56 && value > 49)
+            {
+                return value - 24;
+            }
+            //97-122 == lowercase letters
+            if (value < 123 && value > 96)
+            {
+                return value - 97;
+            }
+
+            throw new ArgumentException("Character is not a Base32 character.", "c");
+        }
+
+        private static char ValueToChar(byte b)
+        {
+            if (b < 26)
+            {
+                return (char)(b + 65);
+            }
+
+            if (b < 32)
+            {
+                return (char)(b + 24);
+            }
+
+            throw new ArgumentException("Byte is not a value Base32 value.", "b");
+        }
+
         private static byte[] hexStr2Bytes(string hex)
         {
             byte[] convert = new byte[hex.Length / 2];
@@ -194,7 +295,9 @@ namespace OTP2
             byte[] arr_byteStr = Encoding.Default.GetBytes(strData);
 
             foreach (byte byteStr in arr_byteStr)
+            {
                 resultHex += string.Format("{0:X2}", byteStr);
+            }
 
             return resultHex;
         }
@@ -203,17 +306,37 @@ namespace OTP2
         {
             byte[] enc = null;
 
-            if (crypto.Contains("1"))
+            if (crypto.Length > 3)
             {
-                HMACSHA1 sha1 = new HMACSHA1(keyBytes);
-                enc = sha1.ComputeHash(text);
-            } else if (crypto.Contains("2"))
+                crypto = crypto.ToLower();
+                crypto = crypto.Split('a')[1];
+            }
+            if (crypto.StartsWith("1"))
             {
-                HMACSHA256 sha2 = new HMACSHA256(keyBytes);
-                enc = sha2.ComputeHash(text);
-            } else if (crypto.Contains("5")) {
-                HMACSHA512 sha5 = new HMACSHA512(keyBytes);
-                enc = sha5.ComputeHash(text);
+                /*HMACSHA1 sha1 = new HMACSHA1(keyBytes);
+                enc = sha1.ComputeHash(text);*/
+                using (HMACSHA1 sha1 = new HMACSHA1(keyBytes))
+                {
+                    enc = sha1.ComputeHash(text);
+                }
+            }
+            else if (crypto.StartsWith("2"))
+            {
+                /*HMACSHA256 sha2 = new HMACSHA256(keyBytes);
+                enc = sha2.ComputeHash(text);*/
+                using (HMACSHA256 sha2 = new HMACSHA256(keyBytes))
+                {
+                    enc = sha2.ComputeHash(text);
+                }
+            }
+            else if (crypto.StartsWith("5"))
+            {
+                /*HMACSHA512 sha5 = new HMACSHA512(keyBytes);
+                enc = sha5.ComputeHash(text);*/
+                using (HMACSHA512 sha5 = new HMACSHA512(keyBytes))
+                {
+                    enc = sha5.ComputeHash(text);
+                }
             }
             return enc;
         }

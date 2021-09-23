@@ -7,7 +7,6 @@ namespace OTP1
 {
     public class TOTP
     {
-
         public static String GenerateOTP(String secretKey, int seconds, int digit, String algorithm)
         {
             DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);

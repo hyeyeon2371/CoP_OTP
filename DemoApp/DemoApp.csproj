@@ -104,6 +104,10 @@
       <Project>{d6886be1-aabc-4388-a5e0-88c5c0387aec}</Project>
       <Name>OTP1</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OTP2\OTP2.csproj">
+      <Project>{bf2aeaba-d94a-47d7-a84d-8e6fb807d649}</Project>
+      <Name>OTP2</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
